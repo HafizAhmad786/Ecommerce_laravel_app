@@ -11,11 +11,11 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-    <title>Demo: Register Basic - Pages | Sneat - Bootstrap Dashboard FREE</title>
+    <title>Register</title>
 
     <meta name="description" content="" />
 
-     @include("partials.auth.header")
+     @include("partials.head")
   </head>
 
   <body>
@@ -137,11 +137,20 @@
                   </div>
                 </div>
                 <button class="btn btn-primary d-grid w-100">Sign up</button>
+                <div style="display: flex;  justify-content: space-between; gap: 10px; margin-top: 10px;">
+                  <button type="button" class="toggle_btn btn btn-secondary w-50" value="buyer" data-bs-toggle="button" aria-pressed="false">
+                    Buyer
+                  </button>
+                  <button type="button" class="toggle_btn btn btn-primary active w-50" value="seller" data-bs-toggle="button" aria-pressed="true">
+                    Seller
+                  </button>
+                </div>
+                <input type="hidden" name="role" id="selectedRole" value="buyer">
               </form>
 
               <p class="text-center">
                 <span>Already have an account?</span>
-                <a href="{{ route("loginPage") }}">
+                <a href="{{ route('loginPage') }}">
                   <span>Sign in instead</span>
                 </a>
               </p>
@@ -162,6 +171,24 @@
     <script src="../assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
 
     <script src="../assets/vendor/js/menu.js"></script>
+
+    <script>
+      var toggleButtons = document.querySelectorAll(".toggle_btn");
+
+      toggleButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+          toggleButtons.forEach(function (btn) {
+            btn.classList.remove("btn-secondary");
+            btn.classList.add("btn-primary");
+          });
+            button.classList.remove("btn-primary");
+            button.classList.add("btn-secondary");
+            document.getElementById("selectedRole").value = button.value;
+        });
+      });
+
+
+    </script>
 
     <!-- endbuild -->
 
