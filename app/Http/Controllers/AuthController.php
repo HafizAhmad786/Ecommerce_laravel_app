@@ -50,8 +50,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            $dashboard = Auth::user()->role == "buyer" ? "buyerdashboard" : "sellerdashboard";
-            return redirect()->route($dashboard);
+            return redirect()->route("dashboard");
         }
 
         return back()->withErrors([

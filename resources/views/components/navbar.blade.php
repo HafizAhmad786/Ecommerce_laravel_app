@@ -8,6 +8,7 @@
 
     <div class="navbar-nav-right d-flex align-items-center justify-content-end" id="navbar-collapse">
         <!-- Search -->
+        @if(!isset($page))
         <div class="navbar-nav align-items-center me-auto">
             <div class="nav-item d-flex align-items-center">
                 <span class="w-px-22 h-px-22"><i class="icon-base bx bx-search icon-md"></i></span>
@@ -15,6 +16,7 @@
                     placeholder="Search..." aria-label="Search..." />
             </div>
         </div>
+        @endif
         <!-- /Search -->
 
         <ul class="navbar-nav flex-row align-items-center ms-md-auto">
@@ -38,8 +40,8 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <h6 class="mb-0">John Doe</h6>
-                                    <small class="text-body-secondary">Admin</small>
+                                    <h6 class="mb-0">{{auth()->user()->name}}</h6>
+                                    <small class="text-body-secondary">{{auth()->user()->role}}</small>
                                 </div>
                             </div>
                         </a>

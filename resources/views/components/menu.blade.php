@@ -62,7 +62,7 @@
   <ul class="menu-inner py-1">
     <!-- Dashboards -->
     <li class="menu-item {{ $page == 'dashboard' ? 'active' : '' }}">
-      <a href="{{ route('buyerdashboard') }}" class="menu-link">
+      <a href="{{ route('dashboard') }}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-home-smile"></i>
         <div class="text-truncate" data-i18n="Dashboards">Dashboards</div>
       </a>
@@ -83,9 +83,12 @@
     </li>
     @if(auth()->user()->role == 'buyer')
     <li class="menu-item {{ $page == 'cart' ? 'active' : '' }}">
-      <a href="javascript:void(0);" class="menu-link">
+      <a href="{{ route('cart') }}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-cart"></i>
-        <div class="text-truncate" data-i18n="Dashboards">Cart</div>
+        <div class="text-truncate cart d-flex justify-content-between w-100" data-i18n="Dashboards">
+          <span>Cart</span>
+          <span class="counter" style="color:red;"></span>
+        </div>
       </a>
     </li>
     @endif

@@ -57,7 +57,7 @@
                     </tr>
                   </thead>
                   <tbody class="table-border-bottom-0" id="table_id">
-                    @foreach($products as $product)
+                    @foreach($userProducts as $product)
                     <tr>
                       <td>
                         <img src="{{ asset('storage/images/'.$product->product_image) }}" alt="" width="40px"

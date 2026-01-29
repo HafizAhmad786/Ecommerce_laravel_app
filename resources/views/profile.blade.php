@@ -86,10 +86,8 @@
                                                 <button type="submit" class="btn btn-primary me-3">
                                                     Save changes
                                                 </button>
-                                                <a href="{{ route('sellerdashboard') }}"><button type="reset"
-                                                        class="btn btn-outline-secondary">
-                                                        Cancel
-                                                    </button></a>
+                                                <a href="{{ route('dashboard') }}"
+                                                    class="btn btn-outline-secondary">Cancel</a>
                                             </div>
                                         </form>
                                     </div>

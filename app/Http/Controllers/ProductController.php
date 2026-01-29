@@ -3,20 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
+use App\Models\{
+    product,
+    user
+};
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
 
 class ProductController extends Controller
 {
     public function getAllProducts()
     {
         $products = Product::all();
-        if (Auth::user()->role == "buyer") {
+        if (Auth::user()->role == "seller") {
+            $userProducts = Auth::user()->products;
+            return view('seller.dashboard', compact('userProducts'));
+        } else {
             return view('buyer.dashboard', compact('products'));
         }
-        return view('seller.dashboard', compact('products'));
     }
 
 
@@ -42,7 +46,7 @@ class ProductController extends Controller
         }
 
         Product::create($data);
-        return redirect()->route("sellerdashboard");
+        return redirect()->route("dashboard");
     }
 
     public function getProductById(Request $request)
@@ -70,12 +74,12 @@ class ProductController extends Controller
         }
 
         Product::where('id', $request->product_id)->update($data);
-        return redirect()->route("sellerdashboard");
+        return redirect()->route("dashboard");
     }
 
     public function deleteProduct(int $id)
     {
         Product::where('id', $id)->delete();
-        return redirect()->route("sellerdashboard");
+        return redirect()->route("dashboard");
     }
 }

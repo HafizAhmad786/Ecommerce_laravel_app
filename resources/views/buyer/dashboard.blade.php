@@ -63,8 +63,9 @@
                                             <td><span class="badge bg-label-primary me-1">{{ $product->quantity
                                                     }}</span></td>
                                             <td>
-                                                <a id="trash" class="dropdown-item" href="javascript:void(0);"><i
-                                                        class="icon-base bx bx-cart me-1"></i></a>
+                                                <a class="dropdown-item" href="javascript:void(0);"><i
+                                                        class="icon-base bx bx-cart me-1 cart-index"
+                                                        data-id="{{ $product->id }}"></i></a>
                                             </td>
                                         </tr>
                                         @endforeach
@@ -121,6 +122,20 @@
 
         <script>
             $(document).ready(function () {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('getCartProducts') }}",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (res) {
+                        if (res['counter'] && res['counter'] > 0) {
+                            $(".cart").append('<span style="color: red;" class="counter">' + res['counter'] + '</span>')
+                        }
+                    }
+                });
+
+
                 $(".edit").on("click", function (event) {
                     event.preventDefault();
                     $.ajax({
@@ -146,6 +161,30 @@
                         }
                     })
                 });
+            });
+
+            $(".cart-index").click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('addToCart') }}",
+                    dataType: "json",
+                    data: {
+                        "product_id": $(this).data('id')
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (res) {
+                        if (res['status']) {
+                            var val = $(".cart").find(".counter").html();
+                            $(".cart").find(".counter").html(++val);
+                        }
+                    },
+                    error: (error) => {
+                        console.log(error);
+                    }
+                });
+
             });
         </script>
 </body>
