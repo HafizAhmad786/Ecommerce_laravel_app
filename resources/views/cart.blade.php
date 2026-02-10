@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-
+    <meta name="csrf-token" content="{{csrf_token()}}">
     <title>
         Demo: Account settings - Account | Sneat - Bootstrap Dashboard FREE
     </title>
@@ -16,6 +16,28 @@
 
     @include("partials.head")
 </head>
+
+<style>
+    .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #04AA6D;
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        animation: spin 1s linear infinite;
+        /* Animation definition */
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
 
 <body>
     <!-- Layout wrapper -->
@@ -34,62 +56,94 @@
 
                 <!-- Content wrapper -->
                 @if(session('success'))
-                <div class="alert alert-success container">
+                <div class="alert alert-success alert-dismissible fade show container">
                     {{ session('success') }}
                 </div>
                 @endif
 
-
-                <div class="card">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="card-header">Product List</h5>
-                    </div>
-                    <div class="table-responsive text-nowrap">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Image</th>
-                                    <th>Product Name</th>
-                                    <th>Product price</th>
-                                    <th>Quantity</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="table-border-bottom-0" id="table_id">
-                                @foreach($carts as $cart)
-                                <tr>
-                                    <td>
-                                        <img src="{{ asset('storage/images/'.$cart->product_image) }}" alt=""
-                                            width="40px" height="40px">
-                                    </td>
-                                    <td>{{ $cart->product_name }}</td> <!-- product name-->
-                                    <td>{{ $cart->product_price }}</td> <!-- product price-->
-                                    <td><span class="badge bg-label-primary me-1">{{ $cart->quantity
-                                            }}</span></td>
-                                    <td>
-                                        <a class="dropdown-item edit" href="javascript:void(0);"
-                                            data-product-id="{{ $cart->id }}"><i class="icon-base bx bx-edit-alt me-1"
-                                                data-bs-toggle="modal" data-bs-target="#createProductModel"></i>
-                                            Edit</a>
-                                        <a id="trash" class="dropdown-item"
-                                            href="{{ route('deleteProduct', $cart->id) }}"><i
-                                                class="icon-base bx bx-trash me-1"></i> Delete</a>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show container">
+                    {{ session('error') }}
                 </div>
+                @endif
 
-                <form action="{{ route('makePayment') }}" method="POST" id="stripe-form" class="container mt-4">
+
+                <div class="container-xxl flex-grow-1 container-p-y">
+                    <div class="card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-header">Product List</h5>
+                        </div>
+                        <div class="table-responsive text-nowrap">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Image</th>
+                                        <th class="text-center">Product Name</th>
+                                        <th class="text-center">Product price</th>
+                                        <th class="text-center">Total Quantity</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="table-border-bottom-0" id="table_id">
+                                    @foreach($carts as $cart)
+                                    <tr>
+                                        <td>
+                                            <img src="{{ asset('storage/images/'.$cart->product_image) }}" alt=""
+                                                width="40px" height="40px">
+                                        </td>
+                                        <td class="text-center">{{ $cart->product_name }}</td> <!-- product name-->
+                                        <td class="text-center price">{{ $cart->product_price }}</td>
+                                        <!-- product price-->
+                                        <td class="text-center"><span
+                                                class="badge bg-label-primary me-1 total_quantity">{{ $cart->quantity
+                                                }}</span></td>
+                                        <td class="d-flex justify-content-center">
+                                            <div class="d-flex gap-6 ">
+                                                <button class="btn btn-danger decrement">-</button>
+                                                <p
+                                                    class="mb-0 d-flex align-items-center justify-content-center quantity">
+                                                    1
+                                                </p>
+                                                <button class="btn btn-primary increment">+</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            <div class="d-flex justify-content-between container ">
+                                <h4>
+                                    Total Price
+                                </h4>
+                                <div class="d-flex justify-content-end align-items-center">
+                                    <p>$</p>
+                                    <p class="d-flex align-items-center justify-content-center total_price"
+                                        style="padding-right: 51px;">0.00</p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <form method="POST" id="stripe-form" class="container mt-4">
                     @csrf
-                    <input type="hidden" name="price" value="200">
+                    <input type="hidden" name="price" id="total_price" value="0">
                     <input type="hidden" id="stripe-token" name="stripeToken">
                     <div id="card-element" class="form-control">
                     </div>
-                    <button type="button" class="btn btn-primary mt-4" onclick="createToken()" id="submit-btn">Pay
-                        $200</button>
+                    <!-- <button type="button" class="btn btn-primary d-flex justify-content-center align-items-center mt-4"
+                        onclick="createToken()">
+                        <span class="me-1">$</span>
+                        <span class="total_price" id="total_price_display">0.00</span>
+                    </button> -->
+
+                    <button type="submit" class="btn btn-primary d-flex justify-content-center align-items-center mt-4">
+                        <div class="loader d-none"></div>
+                        <span class="span me-1">$</span>
+                        <span class="span total_price" id="total_price_display">0.00</span>
+                    </button>
+
                 </form>
                 <!-- Content wrapper -->
             </div>
@@ -101,20 +155,121 @@
     </div>
 
     @include("partials.corejs")
-    <script src="https://js.stripe.com/v3/"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
+
+        //stripe 
         var stripe = Stripe("{{ config('stripe.stripe.public') }}");
         var elements = stripe.elements();
         var cardElement = elements.create("card");
         cardElement.mount("#card-element");
-        function createToken() {
+
+        $("#stripe-form").submit(function (e) {
+            e.preventDefault();
+
+            $(".loader").removeClass("d-none").addClass("d-block");
+            $(".span").addClass("d-none");
+
+            var form = this;
+
             stripe.createToken(cardElement).then(function (result) {
-                if (result.token) {
-                    document.getElementById("stripe-token").value = result.token.id;
-                    document.getElementById("stripe-form").submit();
+
+                if (result.error) {
+                    $(".loader").addClass("d-none").removeClass("d-block");
+                    $(".span").removeClass("d-none").addClass("d-block");
+                    return;
                 }
+
+                $("#stripe-token").val(result.token.id);
+                var formData = new FormData(form);
+                $.ajax({
+                    url: "{{ route('makePayment') }}",
+                    data: formData,
+                    dataType: "json",
+                    type: "POST",
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (result) {
+                        if (result['status'] == true) {
+                            $(".loader").addClass("d-none");
+                            $(".span").removeClass("d-none");
+                            Swal.fire({
+                                title: "Success",
+                                text: result['message'],
+                                icon: "success"
+                            });
+                        } else {
+                            $(".loader").addClass("d-none");
+                            $(".span").removeClass("d-none");
+                            Swal.fire({
+                                title: "Error",
+                                text: result['message'],
+                                icon: "error"
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $(".loader").addClass("d-none");
+                        $(".span").removeClass("d-none");
+                        Swal.fire({
+                            title: "Error",
+                            text: xhr.responseJSON.message,
+                            icon: "error"
+                        });
+                    }
+                });
             });
-        }
+        });
+
+        $(document).ready(function () {
+            var totalPrice = 0.00;
+            var tableBody = $("#table_id tr").each(function (index) {
+                var price = parseInt($(this).find(".price").text());
+                var quantity = parseFloat($(this).find(".quantity").text());
+                totalPrice += (price * quantity);
+            });
+
+            $(".total_price").text(totalPrice);
+            $("#total_price").val(totalPrice);
+
+        });
+
+
+        //increment the quantity
+        $(".increment").on("click", function () {
+            let quantityEl = $(this).closest("td").find(".quantity");
+            let totalPrice = parseInt($(".total_price").html());
+            let price = $(this).closest("tr").find(".price").text();
+            let totalQuantity = $(this).closest("tr").find(".total_quantity").text();
+            let quantity = parseInt(quantityEl.text());
+            if (quantity < parseInt(totalQuantity)) {
+                quantity++;
+                totalPrice += parseInt(price);
+            }
+            $(".total_price").text(totalPrice);
+            $("#total_price").val(totalPrice);
+            quantityEl.text(quantity);
+        });
+
+        //decrement the quanity
+        $(".decrement").on("click", function () {
+            var quantityEl = $(this).siblings(".quantity");
+            let totalPrice = parseInt($(".total_price").html());
+            let price = $(this).closest("tr").find(".price").text();
+            var quantity = parseInt(quantityEl.text());
+            if (quantity > 1) {
+                quantity--;
+                totalPrice -= parseInt(price);
+            }
+            quantityEl.text(quantity);
+            $("#total_price").val(totalPrice);
+            $(".total_price").text(totalPrice);
+        });
 
 
     </script>

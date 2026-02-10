@@ -5,9 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
+use App\Services\PaymentServices;
+use App\Models\Orders;
+use App\Models\OrderItem;
+use Exception;
 
 class CartController extends Controller
 {
+    protected $paymentServices;
+
+    public function __construct(PaymentServices $paymentServices)
+    {
+        $this->paymentServices = $paymentServices;
+    }
+
     public function index()
     {
         $user = Auth::user();
@@ -43,14 +54,34 @@ class CartController extends Controller
 
     public function makePayment(Request $request)
     {
-        $stripe = new \Stripe\StripeClient(config('stripe.stripe.secret'));
-        $stripe->charges->create([
-            'amount' => $request->price * 100,
-            'currency' => 'usd',
-            'source' => $request->stripeToken,
-            'description' => 'Payment from customer',
-        ]);
+        try {
+            $result = $this->paymentServices->pay($request->price, $request->stripeToken);
+           $order = Orders::create([
+                "buyer_id" => Auth::user()->id,
+                "total_price" => $request->price,
+                "status" => $result->status,
+                "payment_id" => $result->id,
+                "url" => $result->receipt_url
+            ]);
 
-        return redirect('dashboard')->withSuccess("Payment successful");
+            OrderItem::create([
+                "order_id" => $order->id,
+                "product_id" => 1,
+                "quantity" => 2,
+                "price" => 10,
+                "total_price" => 100
+            ]);
+            
+            return response()->json([
+                "status" => true,
+                "message" => "Payment successful",
+                "data" => $result->id
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage()
+            ]);
+        }
     }
 }

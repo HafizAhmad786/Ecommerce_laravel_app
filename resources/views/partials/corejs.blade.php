@@ -22,3 +22,5 @@
 
 <!-- Place this tag before closing body tag for github widget button. -->
 <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<script src="https://js.stripe.com/v3/"></script>
