@@ -85,17 +85,17 @@
                                     </tr>
                                 </thead>
                                 <tbody class="table-border-bottom-0" id="table_id">
-                                    @foreach($carts as $cart)
+                                    @forelse($products as $product)
                                     <tr>
                                         <td>
-                                            <img src="{{ asset('storage/images/'.$cart->product_image) }}" alt=""
+                                            <img src="{{ asset('storage/images/'.$product->product_image) }}" alt=""
                                                 width="40px" height="40px">
                                         </td>
-                                        <td class="text-center">{{ $cart->product_name }}</td> <!-- product name-->
-                                        <td class="text-center price">{{ $cart->product_price }}</td>
+                                        <td class="text-center">{{ $product->product_name }}</td> <!-- product name-->
+                                        <td class="text-center price">{{ $product->product_price }}</td>
                                         <!-- product price-->
                                         <td class="text-center"><span
-                                                class="badge bg-label-primary me-1 total_quantity">{{ $cart->quantity
+                                                class="badge bg-label-primary me-1 total_quantity">{{ $product->quantity
                                                 }}</span></td>
                                         <td class="d-flex justify-content-center">
                                             <div class="d-flex gap-6 ">
@@ -108,7 +108,9 @@
                                             </div>
                                         </td>
                                     </tr>
-                                    @endforeach
+                                    @empty
+                                    <h3 class="text-center">Cart is Empty</h3>
+                                    @endforelse
                                 </tbody>
                             </table>
                             <div class="d-flex justify-content-between container ">
@@ -132,12 +134,6 @@
                     <input type="hidden" id="stripe-token" name="stripeToken">
                     <div id="card-element" class="form-control">
                     </div>
-                    <!-- <button type="button" class="btn btn-primary d-flex justify-content-center align-items-center mt-4"
-                        onclick="createToken()">
-                        <span class="me-1">$</span>
-                        <span class="total_price" id="total_price_display">0.00</span>
-                    </button> -->
-
                     <button type="submit" class="btn btn-primary d-flex justify-content-center align-items-center mt-4">
                         <div class="loader d-none"></div>
                         <span class="span me-1">$</span>
@@ -173,6 +169,14 @@
             $(".span").addClass("d-none");
 
             var form = this;
+            var quantity = [];
+
+
+            var tableBody = $("#table_id tr").each(function (index) {
+                quantity.push(parseFloat($(this).find(".quantity").text()));
+            });
+
+
 
             stripe.createToken(cardElement).then(function (result) {
 
@@ -184,6 +188,9 @@
 
                 $("#stripe-token").val(result.token.id);
                 var formData = new FormData(form);
+                quantity.forEach(qty => {
+                    formData.append('quantity[]', qty);
+                });
                 $.ajax({
                     url: "{{ route('makePayment') }}",
                     data: formData,
@@ -203,6 +210,9 @@
                                 text: result['message'],
                                 icon: "success"
                             });
+                            setTimeout(function () {
+                                location.reload();
+                            }, 2000);
                         } else {
                             $(".loader").addClass("d-none");
                             $(".span").removeClass("d-none");
@@ -211,6 +221,7 @@
                                 text: result['message'],
                                 icon: "error"
                             });
+
                         }
                     },
                     error: function (xhr, status, error) {

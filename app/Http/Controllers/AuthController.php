@@ -22,11 +22,6 @@ class AuthController extends Controller
         return view("auth.register");
     }
 
-    public function getUserInfo()
-    {
-        return view('profile', ['user' => Auth::user()]);
-    }
-
     public function updateUserInfor(Request $request)
     {
         $validated = $request->validate([

@@ -41,36 +41,17 @@
                                 <h5 class="card-header">Product List</h5>
                             </div>
                             <div class="table-responsive text-nowrap">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Image</th>
-                                            <th>Product Name</th>
-                                            <th>Product price</th>
-                                            <th>Quantity</th>
-                                            <th>Cart</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="table-border-bottom-0" id="table_id">
-                                        @foreach($products as $product)
-                                        <tr>
-                                            <td>
-                                                <img src="{{ asset('storage/images/'.$product->product_image) }}" alt=""
-                                                    width="40px" height="40px">
-                                            </td>
-                                            <td>{{ $product->product_name }}</td> <!-- product name-->
-                                            <td>{{ $product->product_price }}</td> <!-- product price-->
-                                            <td><span class="badge bg-label-primary me-1">{{ $product->quantity
-                                                    }}</span></td>
-                                            <td>
-                                                <a class="dropdown-item" href="javascript:void(0);"><i
-                                                        class="icon-base bx bx-cart me-1 cart-index"
-                                                        data-id="{{ $product->id }}"></i></a>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                <div class="d-flex gap-10 p-10">
+                                    @foreach($products as $product)
+                                    <div class="text-center cart-index" style="cursor: pointer;"
+                                        data-id="{{ $product->id }}">
+                                        <img src="{{ asset('storage/images/'.$product->product_image) }}" alt=""
+                                            style="height:100px;width:100px;border-radius: 10px;">
+                                        <h6>{{ $product->product_name }}</h6>
+                                        <h5>{{ $product->product_price }}</h5>
+                                    </div>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
 

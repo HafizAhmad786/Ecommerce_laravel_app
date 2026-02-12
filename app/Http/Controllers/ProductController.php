@@ -23,7 +23,6 @@ class ProductController extends Controller
         }
     }
 
-
     public function createProduct(Request $request)
     {
 
@@ -31,6 +30,7 @@ class ProductController extends Controller
             "product_name" => "required|string",
             "product_price" => "required|numeric",
             "quantity" => "required|integer",
+            "image" => "nullable|image|mimes:jpg,jpeg,png,webp|max:2048"
         ]);
 
         $data = [
@@ -42,7 +42,7 @@ class ProductController extends Controller
 
         if ($request->hasFile('image')) {
             $request->image->store('images', "public");
-            $data["product_image"] = $request->image->hashName();
+            $data["product_image"] = $validated['image']->hashName();
         }
 
         Product::create($data);
@@ -60,6 +60,7 @@ class ProductController extends Controller
             "product_name" => "required|string",
             "product_price" => "required|numeric",
             "quantity" => "required|integer",
+            "image" => "nullable|image|mimes:jpg,jpeg,png,webp|max:2048"
         ]);
 
         $data = [
@@ -70,7 +71,7 @@ class ProductController extends Controller
 
         if ($request->hasFile('image')) {
             $request->image->store('images', "public");
-            $data["product_image"] = $request->image->hashName();
+            $data["product_image"] = $validated['image']->hashName();
         }
 
         Product::where('id', $request->product_id)->update($data);

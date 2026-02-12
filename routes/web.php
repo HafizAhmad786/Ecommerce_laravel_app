@@ -1,16 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\{
+    AuthController,
+    CartController,
+    ProductController,
+    SalesController,
+    UserController
+};
 
 Route::get('/', function () {
     return view('auth.login');
 });
 
 
-Route::get("/user/profile", [AuthController::class, "getUserInfo"])->name("getUserInfo")->middleware('auth');
+Route::get("/user/profile", [UserController::class, "getUserInfo"])->name("getUserInfo")->middleware('auth');
 Route::post("/user/profile/update", [AuthController::class, "updateUserInfor"])->name("updateUserInfor")->middleware('auth');
 
 // auth views
@@ -42,3 +46,5 @@ Route::middleware(['auth', 'role:seller'])->group(function () {
 // user views
 Route::get("/seller/dashboard", [ProductController::class, "getAllProducts"])->name("dashboard")->middleware(['auth', 'role:seller']);
 Route::get("/buyer/dashboard", [ProductController::class, "getAllProducts"])->name("dashboard")->middleware(['auth', 'role:buyer']);
+
+Route::get("/seller/sales", [SalesController::class, "index"])->name("sales");

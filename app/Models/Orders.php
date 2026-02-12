@@ -16,4 +16,15 @@ class Orders extends Model
         "payment_id",
         "url",
     ];
+
+    public function buyer()
+    {
+        return $this->belongsTo(User::class, 'buyer_id');
+    }
+
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class, 'order_id')
+            ->with('product');
+    }
 }

@@ -205,58 +205,7 @@
         });
       });
     </script>
-    <!-- <script>
-      
-
-      $("#edit").on("submit", function (event) {
-        event.preventDefault();
-
-        var formData = new FormData(this);
-
-        $.ajax({
-          type: "POST",
-          url: "",
-          datatype: "json",
-          headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          },
-          data: formData.append('id', $("#product_id").val()),
-          success: function (response) {
-            console.log(response);
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            console.error("Request failed: " + textStatus);
-          }
-        })
-      });
-
-
-
-      $("#product_model").on("submit", function (event) {
-        event.preventDefault();
-
-        var formData = new FormData(this);
-
-        $.ajax({
-          type: "POST",
-          url: "",
-          data: formData,
-          contentType: false,
-          processData: false,
-          datatype: "json",
-          headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          },
-          success: function (response) {
-            console.log(response);
-          },
-          error: function (jqXHR, textStatus, errorThrown) {
-            console.error("Request failed: " + textStatus);
-          }
-        })
-      });
-
-    </script> -->
+   
 </body>
 
 </html>

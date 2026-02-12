@@ -68,8 +68,8 @@
       </a>
     </li>
     @if(auth()->user()->role == 'seller')
-    <li class="menu-item {{ $page == 'money' ? 'active' : '' }}">
-      <a href="javascript:void(0);" class="menu-link">
+    <li class="menu-item {{ $page == 'sales' ? 'active' : '' }}">
+      <a href="{{ route('sales') }}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-money"></i>
         <div class="text-truncate" data-i18n="Dashboards">Sales Records</div>
       </a>
