@@ -54,6 +54,21 @@ class ProductController extends Controller
         return Product::where('id', $request->id)->first();
     }
 
+    public function searchProducts(Request $request)
+    {
+        $validated = $request->validate([
+            "product_name" => "required|string"
+        ]);
+
+        $name = $validated['product_name'];
+
+        return response()->json([
+            "status" => true,
+            "products" => Product::where("product_name", "LIKE", "%$name%")->get()
+        ]);
+    }
+
+
     public function updateProduct(Request $request)
     {
         $validated = $request->validate([

@@ -28,7 +28,7 @@
       <!-- Layout container -->
       <div class="layout-page">
         <!-- Navbar -->
-        @include("components.navbar")
+        @include("components.navbar",['page'=>'dashboard'])
         <!-- / Navbar -->
 
         <!-- Content wrapper -->

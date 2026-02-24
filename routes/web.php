@@ -48,3 +48,6 @@ Route::get("/seller/dashboard", [ProductController::class, "getAllProducts"])->n
 Route::get("/buyer/dashboard", [ProductController::class, "getAllProducts"])->name("dashboard")->middleware(['auth', 'role:buyer']);
 
 Route::get("/seller/sales", [SalesController::class, "index"])->name("sales");
+
+Route::post("/getProduct",[SalesController::class,"getOrderProducts"])->name("getProducts");
+Route::post("/searchProducts",[ProductController::class,"searchProducts"])->name("searchProduct");

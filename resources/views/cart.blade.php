@@ -50,7 +50,7 @@
             <!-- Layout container -->
             <div class="layout-page">
                 <!-- Navbar -->
-                @include("components.navbar",['page'=>'cart'])
+                @include("components.navbar")
 
                 <!-- / Navbar -->
 

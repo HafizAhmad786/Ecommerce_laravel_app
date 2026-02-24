@@ -67,14 +67,14 @@
         <div class="text-truncate" data-i18n="Dashboards">Dashboards</div>
       </a>
     </li>
-    @if(auth()->user()->role == 'seller')
+    
     <li class="menu-item {{ $page == 'sales' ? 'active' : '' }}">
       <a href="{{ route('sales') }}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-money"></i>
         <div class="text-truncate" data-i18n="Dashboards">Sales Records</div>
       </a>
     </li>
-    @endif
+    
     <li class="menu-item {{ $page == 'profile' ? 'active' : '' }}">
       <a href="{{ route('getUserInfo') }}" class="menu-link">
         <i class="menu-icon tf-icons bx bx-user"></i>

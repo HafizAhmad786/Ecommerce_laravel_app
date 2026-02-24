@@ -14,7 +14,7 @@
 
     <meta name="description" content="" />
 
-    @include("partials.head")
+    @include('partials.head')
 </head>
 
 <body>
@@ -22,13 +22,13 @@
     <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
             <!-- Menu -->
-            @include("components.menu",['page'=>'dashboard'])
+            @include('components.menu', ['page' => 'dashboard'])
             <!-- / Menu -->
 
             <!-- Layout container -->
             <div class="layout-page">
                 <!-- Navbar -->
-                @include("components.navbar")
+                @include('components.navbar', ['page' => 'dashboard'])
                 <!-- / Navbar -->
 
                 <!-- Content wrapper -->
@@ -42,14 +42,14 @@
                             </div>
                             <div class="table-responsive text-nowrap">
                                 <div class="d-flex gap-10 p-10">
-                                    @foreach($products as $product)
-                                    <div class="text-center cart-index" style="cursor: pointer;"
-                                        data-id="{{ $product->id }}">
-                                        <img src="{{ asset('storage/images/'.$product->product_image) }}" alt=""
-                                            style="height:100px;width:100px;border-radius: 10px;">
-                                        <h6>{{ $product->product_name }}</h6>
-                                        <h5>{{ $product->product_price }}</h5>
-                                    </div>
+                                    @foreach ($products as $product)
+                                        <div class="text-center cart-index" style="cursor: pointer;"
+                                            data-id="{{ $product->id }}">
+                                            <img src="{{ asset('storage/images/' . $product->product_image) }}"
+                                                alt="" style="height:100px;width:100px;border-radius: 10px;">
+                                            <h6>{{ $product->product_name }}</h6>
+                                            <h5>{{ $product->product_price }}</h5>
+                                        </div>
                                     @endforeach
                                 </div>
                             </div>
@@ -99,25 +99,47 @@
             <!-- Overlay -->
             <div class="layout-overlay layout-menu-toggle"></div>
         </div>
-        @include("partials.corejs")
+        @include('partials.corejs')
 
         <script>
-            $(document).ready(function () {
+            $("#searchField").onChange(function() {
+                $.ajax({
+                    url: "{{ route('searchProduct') }}",
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        "product_name": "name"
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(res) {
+
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(error);
+                    }
+                });
+            });
+
+
+            $(document).ready(function() {
                 $.ajax({
                     type: "GET",
                     url: "{{ route('getCartProducts') }}",
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    success: function (res) {
+                    success: function(res) {
                         if (res['counter'] && res['counter'] > 0) {
-                            $(".cart").append('<span style="color: red;" class="counter">' + res['counter'] + '</span>')
+                            $(".cart").append('<span style="color: red;" class="counter">' + res[
+                                'counter'] + '</span>')
                         }
                     }
                 });
 
 
-                $(".edit").on("click", function (event) {
+                $(".edit").on("click", function(event) {
                     event.preventDefault();
                     $.ajax({
                         type: "GET",
@@ -129,7 +151,7 @@
                         data: {
                             id: $(this).data('product-id')
                         },
-                        success: function (response) {
+                        success: function(response) {
                             $('#product_name').val(response['product_name']);
                             $('#product_price').val(response['product_price']);
                             $('#quantity').val(response['quantity']);
@@ -137,14 +159,14 @@
                             $("#productModel").attr("action", "{{ route('updateProduct') }}");
                             $('#product_id').val(response['id']);
                         },
-                        error: function (jqXHR, textStatus, errorThrown) {
+                        error: function(jqXHR, textStatus, errorThrown) {
                             console.error("Request failed: " + textStatus);
                         }
                     })
                 });
             });
 
-            $(".cart-index").click(function () {
+            $(".cart-index").click(function() {
                 $.ajax({
                     type: "POST",
                     url: "{{ route('addToCart') }}",
@@ -155,7 +177,7 @@
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    success: function (res) {
+                    success: function(res) {
                         if (res['status']) {
                             var val = $(".cart").find(".counter").html();
                             $(".cart").find(".counter").html(++val);
