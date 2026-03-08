@@ -102,27 +102,7 @@
         @include('partials.corejs')
 
         <script>
-            $("#searchField").onChange(function() {
-                $.ajax({
-                    url: "{{ route('searchProduct') }}",
-                    type: "POST",
-                    dataType: "json",
-                    data: {
-                        "product_name": "name"
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function(res) {
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log(error);
-                    }
-                });
-            });
-
-
+    
             $(document).ready(function() {
                 $.ajax({
                     type: "GET",
