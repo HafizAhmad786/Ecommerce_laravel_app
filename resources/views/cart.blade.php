@@ -136,8 +136,7 @@
                     </div>
                     <button type="submit" class="btn btn-primary d-flex justify-content-center align-items-center mt-4">
                         <div class="loader d-none"></div>
-                        <span class="span me-1">$</span>
-                        <span class="span total_price" id="total_price_display">0.00</span>
+                        <span class="span" id="total_price_display">Check Out</span>
                     </button>
 
                 </form>

@@ -50,13 +50,13 @@
                                                     {{ $order->id }}
                                                 </td>
                                                 <td>
-                                                    {{ $order->created_at }}
+                                                    {{ $order->created_at->format('l d Y') }}
                                                 </td>
                                                 <td>{{ $order->buyer->name }}</td>
                                                 <td><span
                                                         class="badge bg-label-primary me-1">{{ $order->status }}</span>
                                                 </td>
-                                                <td>{{ $order->total_price }}</td>
+                                                <td>${{ $order->total_price }}</td>
                                                 <td><a href="{{ $order->url }}">Url</a></td>
                                                 <td><input type="button" class="btn btn-primary view" value="View">
                                                 </td>
@@ -73,6 +73,7 @@
                     aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
+                            <h4 class="modal-title text-center p-4">Order Items</h4>
                             <div class="table-responsive text-nowrap">
                                 <table class="table">
                                     <thead>

@@ -59,12 +59,14 @@
                                     <tbody class="table-border-bottom-0" id="table_id">
                                         @foreach ($userProducts as $product)
                                             <tr>
-                                                <td>
+                                                <td class="product_image">
                                                     <img src="{{ asset('storage/images/' . $product->product_image) }}"
                                                         alt="" width="40px" height="40px">
                                                 </td>
-                                                <td>{{ $product->product_name }}</td> <!-- product name-->
-                                                <td>{{ $product->product_price }}</td> <!-- product price-->
+                                                <td class="product_name">{{ $product->product_name }}</td>
+                                                <!-- product name-->
+                                                <td class="product_price">{{ $product->product_price }}</td>
+                                                <!-- product price-->
                                                 <td><span
                                                         class="badge bg-label-primary me-1">{{ $product->quantity }}</span>
                                                 </td>
@@ -77,10 +79,10 @@
                                                         </button>
                                                         <div class="dropdown-menu">
                                                             <a class="dropdown-item edit" href="javascript:void(0);"
-                                                                data-product-id="{{ $product->id }}"><i
-                                                                    class="icon-base bx bx-edit-alt me-1"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#createProductModel"></i>
+                                                                data-product-id="{{ $product->id }}"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#createProductModel"><i
+                                                                    class="icon-base bx bx-edit-alt me-1"></i>
                                                                 Edit</a>
                                                             <a id="trash" class="dropdown-item"
                                                                 href="{{ route('deleteProduct', $product->id) }}"><i
@@ -189,10 +191,12 @@
         @include('partials.corejs')
 
         <script>
-            $("#searchField").on("change", function(e) {
-                var value = $(this).val();
+            var asset = "{{ asset('storage/images') }}";
 
-                if (value.trim() == "") {
+            $("#searchField").on("change", function(e) {
+                var name = $(this).val();
+
+                if (name.trim() == "") {
                     alert("It can't be empty");
                     return;
                 }
@@ -202,13 +206,47 @@
                     type: "POST",
                     dataType: "json",
                     data: {
-                        "product_name": value
+                        "product_name": name
                     },
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(res) {
-
+                        $("#table_id").html("");
+                        res.products.forEach(product => {
+                            $("#table_id").append(`
+                                <tr>
+                                    <td>
+                                        <img src=${asset}/${product.product_image}
+                                            alt="" width="40px" height="40px">
+                                    </td>
+                                    <td>${product.product_name}</td>
+                                    <td>${product.product_price}</td>
+                                    <td><span
+                                            class="badge bg-label-primary me-1">${product.quantity}</span>
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button type="button"
+                                                class="btn p-0 dropdown-toggle hide-arrow"
+                                                data-bs-toggle="dropdown">
+                                                <i class="icon-base bx bx-dots-vertical-rounded"></i>
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item edit" href="javascript:void(0);" data-bs-toggle="modal"
+                                                        data-bs-target="#createProductModel"
+                                                    data-product-id="${product.id}"><i
+                                                        class="icon-base bx bx-edit-alt me-1"></i>
+                                                    Edit</a>
+                                                <a id="trash" class="dropdown-item"
+                                                    href="/product/delete/${product.id}"><i
+                                                        class="icon-base bx bx-trash me-1"></i> Delete</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `);
+                        });
                     },
                     error: function(xhr, status, error) {
                         console.log(error);
@@ -216,33 +254,30 @@
                 });
             });
 
-
-            $(document).ready(function() {
-                $(".edit").on("click", function(event) {
-                    event.preventDefault();
-                    $.ajax({
-                        type: "GET",
-                        url: "{{ route('getProductById') }}",
-                        datatype: "json",
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        data: {
-                            id: $(this).data('product-id')
-                        },
-                        success: function(response) {
-                            $('#product_name').val(response['product_name']);
-                            $('#product_price').val(response['product_price']);
-                            $('#quantity').val(response['quantity']);
-                            $("#createProductModel").modal("show");
-                            $("#productModel").attr("action", "{{ route('updateProduct') }}");
-                            $('#product_id').val(response['id']);
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            console.error("Request failed: " + textStatus);
-                        }
-                    })
-                });
+            $(document).on("click", ".edit", function(event) {
+                event.preventDefault();
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('getProductById') }}",
+                   dataType: "json",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        id: $(this).data('product-id')
+                    },
+                    success: function(response) {
+                        $('#product_name').val(response['product_name']);
+                        $('#product_price').val(response['product_price']);
+                        $('#quantity').val(response['quantity']);
+                        $("#createProductModel").modal("show");
+                        $("#productModel").attr("action", "{{ route('updateProduct') }}");
+                        $('#product_id').val(response['id']);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error("Request failed: " + textStatus);
+                    }
+                })
             });
         </script>
 
