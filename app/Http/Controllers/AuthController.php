@@ -22,15 +22,14 @@ class AuthController extends Controller
         return view("auth.register");
     }
 
-    public function updateUserInfor(Request $request)
+    public function updateUserInfo(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
             'name' => 'required|string|max:100',
         ]);
 
-        User::where("id",  $validated['user_id'])->update([
-            "name" => $request->name,
+        User::where("id",  Auth::user()->id)->update([
+            "name" => $validated['name'],
         ]);
         return redirect()->route("getUserInfo")->with('success', 'Profile updated!');
     }

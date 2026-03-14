@@ -60,7 +60,7 @@
                                 <div class="card mb-6">
                                     <!-- Account -->
                                     <div class="card-body pt-4">
-                                        <form id="formAccountSettings" action="{{ route('updateUserInfor') }}"
+                                        <form id="formAccountSettings" action="{{ route('updateUserInfo') }}"
                                             method="POST">
                                             @csrf
                                             <div class="row g-6">

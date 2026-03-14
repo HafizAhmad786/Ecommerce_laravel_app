@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\{
     Orders,
@@ -17,15 +18,18 @@ class SalesController extends Controller
 
         if (Auth::user()->role == "seller") {
             $orders = Orders::whereHas('items.product', function ($q) use ($sellerId) {
-                $q->where('user_id', $sellerId);
-            });
+                    $q->where('user_id', $sellerId);
+                });
         } else {
             $orders = Orders::where("buyer_id", $sellerId);
         }
 
         $orders = $orders->latest()->get();
 
-        return view("seller.sales_record", compact("orders"));
+        return response()->json([
+            "status" => true,
+            "orders" => $orders
+        ]);
     }
 
     public function getOrderProducts(Request $request)
