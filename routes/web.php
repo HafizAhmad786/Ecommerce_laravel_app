@@ -14,7 +14,7 @@ Route::get('/', function () {
 });
 
 
-Route::get("/user/profile", [UserController::class, "getUserInfo"])->name("getUserInfo")->middleware('auth');
+Route::get("/user/profile", [AuthController::class, "getUserInfo"])->name("getUserInfo")->middleware('auth');
 Route::post("/user/updateProfile", [AuthController::class, "updateUserInfo"])->name("updateUserInfo")->middleware('auth');
 
 // auth views

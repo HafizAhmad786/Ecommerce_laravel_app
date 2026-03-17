@@ -72,6 +72,11 @@ class AuthController extends Controller
         return redirect()->route("loginPage");
     }
 
+    public function getUserInfo()
+    {
+        return view('profile', ['user' => Auth::user()]);
+    }
+
     public function logout(Request $request)
     {
         Auth::logout();
