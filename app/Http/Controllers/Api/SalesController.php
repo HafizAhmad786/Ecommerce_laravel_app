@@ -49,7 +49,7 @@ class SalesController extends Controller
         if (!$items) {
             return response()->json([
                 "status" => false,
-                "message" => "Order not found"
+                "message" => "Orders not found"
             ], 404);
         }
 

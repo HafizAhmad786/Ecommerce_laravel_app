@@ -68,8 +68,7 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
-
-        return redirect()->route("loginPage");
+        return redirect()->route("dashboard");
     }
 
     public function getUserInfo()

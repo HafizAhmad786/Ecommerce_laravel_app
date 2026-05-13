@@ -3,53 +3,51 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 
 
 class AuthController extends Controller
 {
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        $credentials = $request->only("email", "password");
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
 
             return response()->json([
-                "status" => true,
+                "status" => 200,
+                "message" => "User LoggedIn successfully",
                 "token" => $user->createToken('auth_token')->plainTextToken
             ]);
         }
 
         return response()->json([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
+            "status" => 401,
+            "message" => "The provided credentials do not match our records.",
+        ],401); // for error 
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $validated = $request->validate([
-            "name" => "required|string|max:100",
-            'email' => 'required|string|email|unique:users,email',
-            "password" => "required|string|min:6",
-        ]);
-
-        User::create([
-            "name" => $validated['name'],
-            "email" => $validated['email'],
-            "password" => Hash::make($validated['password']),
+        $user = User::create([
+            "name" => $request->name,
+            "email" => $request->email,
+            "password" => Hash::make($request->password),
             "role" => $request->role,
         ]);
 
+
         return response()->json([
-            "status" => true,
-            "message" => "User created successfully"
+            "status" => 201,
+            "message" => "User created successfully",
+            "token" => $user->createToken('auth_token')->plainTextToken
         ]);
     }
 
@@ -58,19 +56,27 @@ class AuthController extends Controller
         $request->user()->tokens()->delete();
 
         return response()->json([
-            "status" => true,
+            "status" => 200,
             "message" => "User logged out successfully"
         ]);
     }
 
     public function updateUserInfo(Request $request)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:100',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json([
+                "status" => 422, // Or 422 for validation errors
+                "message" => "Validation Error",
+                "errors" => $validator->errors() // Or customize this further
+            ], 422);
+        }
+
         User::where("id",  Auth::user()->id)->update([
-            "name" => $validated['name'],
+            "name" => $request->name,
         ]);
         return response()->json([
             "statis" => true,
