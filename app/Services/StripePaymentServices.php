@@ -25,8 +25,7 @@ class StripePaymentServices implements PaymentServices
     }
 
     public function payViaWeb($price,$stripeToken){
-        $stripe = new \Stripe\StripeClient(config('stripe.stripe.secret'));
-        $result = $stripe->charges->create([
+        $result = $this->stripe->charges->create([
             'amount' => $price * 100,
             'currency' => 'usd',
             'source' => $stripeToken,
