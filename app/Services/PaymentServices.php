@@ -3,5 +3,7 @@
 namespace App\Services;
 
 Interface PaymentServices{
-    public function pay($price, $stripeToken);        
+    public function payViaApi($price); 
+    public function payViaWeb($price,$stripeToken); 
+    public function retrievePaymentIntent($id);     
 }

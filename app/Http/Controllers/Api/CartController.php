@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use Stripe\StripeClient;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Cart;
@@ -68,8 +69,44 @@ class CartController extends Controller
         }
     }
 
+    public function initializePayment(Request $request)
+    {
+        $products = $this->fetchUserProducts();
+
+        if ($products->isEmpty()) {
+            return response()->json([
+                "status" => false,
+                "message" => "Cart is empty"
+            ], 400);
+        }
+        $totalPrice = 0;
+
+        $quantitiesMap = $request->input('quantities', []);
+
+        foreach ($products as  $product) {
+            $quantity = $quantitiesMap[$product->id] ?? 1;
+            $totalPrice += ($product->product_price * $quantity);
+        }
+
+        try {
+            $intent = $this->paymentServices->pay($totalPrice);
+            return response()->json([
+                "status" => true,
+                "client_secret" => $intent->client_secret,
+                "payment_intent_id" => $intent->id
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
     public function makePayment(Request $request)
     {
+
+        $request->validate([
+            'payment_intent_id' => 'required|string',
+            'quantity' => 'required|array'
+        ]);
 
         $products = $this->fetchUserProducts();
 
@@ -82,33 +119,39 @@ class CartController extends Controller
 
         DB::beginTransaction();
         try {
-            $result = $this->paymentServices->pay($request->price, $request->stripeToken);
-
+            $intent = $this->paymentServices->retrievePaymentIntent($request->payment_intent_id);
+            
             $order = Orders::create([
                 "buyer_id" => Auth::user()->id,
-                "total_price" => $request->price,
-                "status" => $result->status,
-                "payment_id" => $result->id,
-                "url" => $result->receipt_url
+                "total_price" => $intent->amount / 100,
+                "status" => $intent->status,
+                "payment_id" => $intent->id,
+                "url" => $intent->recepit_url ?? ""
             ]);
 
-            for ($i = 0; $i < count($products); $i++) {
+            $quantitiesMap = $request->input('quantity', []);
+
+            foreach ($products as $product) {
+                $qty = $quantitiesMap[$product->id] ?? 1;
+
                 OrderItem::create([
                     "order_id" => $order->id,
-                    "product_id" => $products[$i]->id,
-                    "quantity" => $request->quantity[$i],
-                    "unit_price" => $products[$i]->product_price,
-                    "total_price" => $products[$i]->product_price * $request->quantity[$i]
+                    "product_id" => $product->id,
+                    "quantity" => $qty,
+                    "unit_price" => $product->product_price,
+                    "total_price" => $product->product_price * $qty
                 ]);
-                Cart::where("product_id", $products[$i]->id)->delete();
+
+                Cart::where("product_id", $product->id) ->delete();
             }
             DB::commit();
             return response()->json([
                 "status" => true,
                 "message" => "Payment successful",
-                "data" => $result->id
+                "data" => $intent->id
             ]);
         } catch (Exception $e) {
+            DB::rollBack();
             return response()->json([
                 "status" => false,
                 "message" => $e->getMessage()

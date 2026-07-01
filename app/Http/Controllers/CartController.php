@@ -76,7 +76,7 @@ class CartController extends Controller
 
         DB::beginTransaction();
         try {
-            $result = $this->paymentServices->pay($request->price, $request->stripeToken);
+            $result = $this->paymentServices->payViaWeb($request->price, $request->stripeToken);
 
             $order = Orders::create([
                 "buyer_id" => Auth::user()->id,

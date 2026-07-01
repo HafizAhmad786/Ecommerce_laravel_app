@@ -75,7 +75,7 @@ class AuthController extends Controller
             ], 422);
         }
 
-        User::where("id",  Auth::user()->id)->update([
+        Auth::user()->update([
             "name" => $request->name,
         ]);
         return response()->json([

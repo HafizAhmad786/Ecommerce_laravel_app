@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\{
     product,
+    Product as ModelsProduct,
     user
 };
 use Illuminate\Support\Facades\Auth;
@@ -55,9 +56,10 @@ class ProductController extends Controller
         ]);
     }
 
-    public function getProductById(int $id)
+    public function getProductById($id)
     {
-        return Product::where('id', $id)->first();
+        // return Product::where('id', $id)->first();
+        // return Product::where('id', $id)->first();
     }
 
     public function searchProducts(Request $request)
@@ -70,7 +72,7 @@ class ProductController extends Controller
 
         return response()->json([
             "status" => true,
-            "products" => Product::where("product_name", "LIKE", "%$name%")->get()
+            // "products" => Product::where("product_name", "LIKE", "%$name%")->get()
         ]);
     }
 
@@ -95,7 +97,7 @@ class ProductController extends Controller
             $data["product_image"] = $validated['image']->hashName();
         }
 
-        Product::where('id', $request->product_id)->update($data);
+        // Product::where('id', $request->product_id)->update($data);
         return response()->json([
             "status" => true,
             "message" => "Product updated successfully"
@@ -104,7 +106,7 @@ class ProductController extends Controller
 
     public function deleteProduct(int $id)
     {
-        Product::where('id', $id)->delete();
+        // Product::where('id', $id)->delete();
         return response()->json([
             "status" => true,
             "message" => "Product deleted successfully"
